@@ -65,12 +65,8 @@ function SortableTask({
 }: {
   task: Task
   editingId: number | null
-  editTitle: string
-  setEditTitle: (v: string) => void
-  editTimeFrom: string
-  setEditTimeFrom: (v: string) => void
-  editTimeTo: string
-  setEditTimeTo: (v: string) => void
+  editTask: { title: string; timeFrom: string; timeTo: string }
+  setEditTask: (v: { title: string; timeFrom: string; timeTo: string }) => void
   onEdit: () => void
   onSave: () => void
   onCancel: () => void
@@ -106,18 +102,19 @@ function SortableTask({
       {editingId === task.id ? (
         <div className="flex-1 flex flex-col gap-2">
           <input
-            value={editTitle}
-            onChange={e => setEditTitle(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && onSave()}
+            value={editTask.title}
+            onChange={e => setEditTask({ ...editTask, title: e.target.value })}
             className="w-full px-3 py-1.5 border border-purple-300 rounded-lg text-sm focus:outline-none"
             autoFocus
           />
           <div className="flex gap-2 items-center">
             <span className="text-xs text-gray-500">От:</span>
-            <input type="time" value={editTimeFrom} onChange={e => setEditTimeFrom(e.target.value)}
+            <input type="time" value={editTask.timeFrom}
+              onChange={e => setEditTask({ ...editTask, timeFrom: e.target.value })}
               className="border border-gray-200 rounded-lg px-2 py-1 text-xs focus:outline-none focus:border-purple-300" />
             <span className="text-xs text-gray-500">До:</span>
-            <input type="time" value={editTimeTo} onChange={e => setEditTimeTo(e.target.value)}
+            <input type="time" value={editTask.timeTo}
+              onChange={e => setEditTask({ ...editTask, timeTo: e.target.value })}
               className="border border-gray-200 rounded-lg px-2 py-1 text-xs focus:outline-none focus:border-purple-300" />
           </div>
           <div className="flex gap-2">
@@ -150,13 +147,9 @@ export default function ManagerPage() {
   const [unreadCount, setUnreadCount] = useState(0)
   const [filterRole, setFilterRole] = useState<RoleType>('CASHIER')
   const [filterShift, setFilterShift] = useState<Shift>('FIRST')
-  const [newTitle, setNewTitle] = useState('')
+  const [newTask, setNewTask] = useState({ title: '', timeFrom: '', timeTo: '' })
   const [editingId, setEditingId] = useState<number | null>(null)
-  const [editTitle, setEditTitle] = useState('')
-  const [editTimeFrom, setEditTimeFrom] = useState('')
-  const [editTimeTo, setEditTimeTo] = useState('')
-  const [newTimeFrom, setNewTimeFrom] = useState('')
-  const [newTimeTo, setNewTimeTo] = useState('')
+  const [editTask, setEditTask] = useState({ title: '', timeFrom: '', timeTo: '' })
   const [pins, setPins] = useState<{ role: RoleType; pin: string }[]>([])
   const [editPin, setEditPin] = useState<{ role: RoleType; pin: string } | null>(null)
 
@@ -217,15 +210,13 @@ export default function ManagerPage() {
   }
 
   async function addTask() {
-    if (!newTitle.trim()) return
+    if (!newTask.title.trim()) return
     await fetch('/api/tasks', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ storeId: session!.storeId, role: filterRole, shift: filterShift, title: newTitle.trim(), timeFrom: newTimeFrom || null, timeTo: newTimeTo || null }),
+      body: JSON.stringify({ storeId: session!.storeId, role: filterRole, shift: filterShift, title: newTask.title.trim(), timeFrom: newTask.timeFrom || null, timeTo: newTask.timeTo || null }),
     })
-    setNewTitle('')
-    setNewTimeFrom('')
-    setNewTimeTo('')
+    setNewTask({ title: '', timeFrom: '', timeTo: '' })
     loadTasks()
   }
 
@@ -233,7 +224,7 @@ export default function ManagerPage() {
     await fetch(`/api/tasks/${id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ title: editTitle, timeFrom: editTimeFrom || null, timeTo: editTimeTo || null }),
+      body: JSON.stringify({ title: editTask.title, timeFrom: editTask.timeFrom || null, timeTo: editTask.timeTo || null }),
     })
     setEditingId(null)
     loadTasks()
@@ -327,18 +318,19 @@ export default function ManagerPage() {
 
             <div className="bg-white rounded-xl border border-gray-200 p-3 mb-4 flex flex-col gap-2">
               <input
-                value={newTitle}
-                onChange={e => setNewTitle(e.target.value)}
-                onKeyDown={e => e.key === 'Enter' && addTask()}
+                value={newTask.title}
+                onChange={e => setNewTask(prev => ({ ...prev, title: e.target.value }))}
                 placeholder="Добавете нова задача..."
                 className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-purple-400"
               />
               <div className="flex gap-2 items-center flex-wrap">
                 <span className="text-xs text-gray-500">От:</span>
-                <input type="time" value={newTimeFrom} onChange={e => setNewTimeFrom(e.target.value)}
+                <input type="time" value={newTask.timeFrom}
+                  onChange={e => setNewTask(prev => ({ ...prev, timeFrom: e.target.value }))}
                   className="border border-gray-200 rounded-lg px-2 py-1 text-xs focus:outline-none focus:border-purple-300" />
                 <span className="text-xs text-gray-500">До:</span>
-                <input type="time" value={newTimeTo} onChange={e => setNewTimeTo(e.target.value)}
+                <input type="time" value={newTask.timeTo}
+                  onChange={e => setNewTask(prev => ({ ...prev, timeTo: e.target.value }))}
                   className="border border-gray-200 rounded-lg px-2 py-1 text-xs focus:outline-none focus:border-purple-300" />
                 <button onClick={addTask} className="ml-auto px-4 py-1.5 bg-purple-600 text-white rounded-lg text-sm font-semibold hover:bg-purple-700">
                   Добави
@@ -354,13 +346,9 @@ export default function ManagerPage() {
                       key={task.id}
                       task={task}
                       editingId={editingId}
-                      editTitle={editTitle}
-                      setEditTitle={setEditTitle}
-                      editTimeFrom={editTimeFrom}
-                      setEditTimeFrom={setEditTimeFrom}
-                      editTimeTo={editTimeTo}
-                      setEditTimeTo={setEditTimeTo}
-                      onEdit={() => { setEditingId(task.id); setEditTitle(task.title); setEditTimeFrom(task.timeFrom || ''); setEditTimeTo(task.timeTo || '') }}
+                      editTask={editTask}
+                      setEditTask={setEditTask}
+                      onEdit={() => { setEditingId(task.id); setEditTask({ title: task.title, timeFrom: task.timeFrom || '', timeTo: task.timeTo || '' }) }}
                       onSave={() => updateTask(task.id)}
                       onCancel={() => setEditingId(null)}
                       onDelete={() => deleteTask(task.id)}
