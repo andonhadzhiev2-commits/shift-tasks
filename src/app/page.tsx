@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { ROLE_LABELS } from '@/lib/types'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -49,25 +48,26 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-lg p-8 w-full max-w-sm">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-gray-50">
+      <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-8 w-full max-w-xs sm:max-w-sm">
+        {/* Logo */}
         <div className="flex justify-center mb-4">
-          <img src="/download.png" alt="Рай Супермаркети" className="h-16 object-contain" />
+          <img src="/download.png" alt="Рай Супермаркети" className="h-14 sm:h-16 object-contain" />
         </div>
-        <p className="text-center text-gray-500 text-sm mb-6">Въведете вашия PIN код</p>
+        <p className="text-center text-gray-500 text-sm mb-5">Въведете вашия PIN код</p>
 
         {/* Store selector */}
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700 mb-1">Магазин</label>
-          <div className="grid grid-cols-3 gap-2">
+        <div className="mb-5">
+          <label className="block text-sm font-medium text-gray-700 mb-2">Магазин</label>
+          <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
             {stores.map(s => (
               <button
                 key={s.id}
-                onClick={() => setStoreId(s.id)}
-                className={`py-2 px-3 rounded-lg text-sm font-medium border transition-all ${
+                onClick={() => { setStoreId(s.id); setError('') }}
+                className={`py-2 px-1 rounded-lg text-xs sm:text-sm font-medium border transition-all ${
                   storeId === s.id
-                    ? 'bg-blue-600 text-white border-blue-600'
-                    : 'bg-white text-gray-700 border-gray-200 hover:border-blue-400'
+                    ? 'bg-red-600 text-white border-red-600'
+                    : 'bg-white text-gray-700 border-gray-200 hover:border-red-400'
                 }`}
               >
                 {s.name}
@@ -76,24 +76,24 @@ export default function LoginPage() {
           </div>
         </div>
 
-        {/* PIN display */}
-        <div className="mb-4">
-          <div className="flex justify-center gap-2 py-3">
-            {[0, 1, 2, 3].map(i => (
-              <div
-                key={i}
-                className={`w-10 h-10 rounded-full border-2 flex items-center justify-center text-xl font-bold transition-all ${
-                  pin.length > i ? 'bg-blue-600 border-blue-600 text-white' : 'border-gray-300 text-transparent'
-                }`}
-              >
-                •
-              </div>
-            ))}
-          </div>
+        {/* PIN dots */}
+        <div className="flex justify-center gap-3 sm:gap-4 py-3 mb-2">
+          {[0, 1, 2, 3].map(i => (
+            <div
+              key={i}
+              className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full border-2 flex items-center justify-center text-xl font-bold transition-all ${
+                pin.length > i ? 'bg-red-600 border-red-600 text-white' : 'border-gray-300'
+              }`}
+            >
+              {pin.length > i ? '•' : ''}
+            </div>
+          ))}
         </div>
 
+        {error && <p className="text-red-500 text-xs text-center mb-2">{error}</p>}
+
         {/* Numpad */}
-        <div className="grid grid-cols-3 gap-3 mb-4">
+        <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-4">
           {['1','2','3','4','5','6','7','8','9','','0','⌫'].map((d, i) => (
             <button
               key={i}
@@ -102,10 +102,10 @@ export default function LoginPage() {
                 else if (d) appendPin(d)
               }}
               disabled={!d}
-              className={`h-14 rounded-xl text-xl font-semibold transition-all ${
+              className={`h-14 sm:h-16 rounded-xl text-xl sm:text-2xl font-semibold transition-all select-none ${
                 !d ? 'invisible' :
-                d === '⌫' ? 'bg-gray-100 text-gray-600 hover:bg-gray-200 active:bg-gray-300' :
-                'bg-gray-100 text-gray-800 hover:bg-gray-200 active:bg-gray-300'
+                d === '⌫' ? 'bg-gray-100 text-gray-600 active:bg-gray-300' :
+                'bg-gray-100 text-gray-800 active:bg-gray-300'
               }`}
             >
               {d}
@@ -113,12 +113,10 @@ export default function LoginPage() {
           ))}
         </div>
 
-        {error && <p className="text-red-500 text-sm text-center mb-3">{error}</p>}
-
         <button
           onClick={handleLogin}
-          disabled={loading || !pin || !storeId}
-          className="w-full py-3 bg-blue-600 text-white rounded-xl font-semibold text-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+          disabled={loading || pin.length < 4 || !storeId}
+          className="w-full py-3.5 bg-red-600 text-white rounded-xl font-semibold text-lg hover:bg-red-700 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
         >
           {loading ? 'Влизане...' : 'Вход'}
         </button>

@@ -146,12 +146,12 @@ export default function ManagerPage() {
         </div>
 
         {/* Tabs */}
-        <div className="max-w-3xl mx-auto px-4 flex gap-1 pb-0">
-          {([['tasks', 'Задачи'], ['notifications', `Уведомления${unreadCount > 0 ? ` (${unreadCount})` : ''}`], ['pins', 'PIN кодове']] as [Tab, string][]).map(([key, label]) => (
+        <div className="max-w-3xl mx-auto px-4 flex gap-0 pb-0 overflow-x-auto">
+          {([['tasks', 'Задачи'], ['notifications', `Известия${unreadCount > 0 ? ` (${unreadCount})` : ''}`], ['pins', 'PIN']] as [Tab, string][]).map(([key, label]) => (
             <button
               key={key}
               onClick={() => setTab(key)}
-              className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-all ${
+              className={`px-3 sm:px-4 py-2.5 text-xs sm:text-sm font-medium border-b-2 whitespace-nowrap transition-all ${
                 tab === key ? 'border-purple-600 text-purple-700' : 'border-transparent text-gray-500 hover:text-gray-700'
               }`}
             >
@@ -166,11 +166,11 @@ export default function ManagerPage() {
         {tab === 'tasks' && (
           <>
             {/* Filters */}
-            <div className="flex gap-2 mb-4 flex-wrap">
+            <div className="flex flex-col gap-2 mb-4">
               <div className="flex gap-1 bg-gray-200 p-1 rounded-xl">
                 {ROLES.map(r => (
                   <button key={r} onClick={() => setFilterRole(r)}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${filterRole === r ? 'bg-white shadow text-gray-800' : 'text-gray-500'}`}>
+                    className={`flex-1 py-1.5 rounded-lg text-xs font-semibold transition-all ${filterRole === r ? 'bg-white shadow text-gray-800' : 'text-gray-500'}`}>
                     {ROLE_LABELS[r]}
                   </button>
                 ))}
@@ -178,7 +178,7 @@ export default function ManagerPage() {
               <div className="flex gap-1 bg-gray-200 p-1 rounded-xl">
                 {SHIFTS.map(s => (
                   <button key={s} onClick={() => setFilterShift(s)}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${filterShift === s ? 'bg-white shadow text-gray-800' : 'text-gray-500'}`}>
+                    className={`flex-1 py-1.5 rounded-lg text-xs font-semibold transition-all ${filterShift === s ? 'bg-white shadow text-gray-800' : 'text-gray-500'}`}>
                     {SHIFT_LABELS[s]}
                   </button>
                 ))}
