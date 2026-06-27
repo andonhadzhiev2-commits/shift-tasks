@@ -67,11 +67,14 @@ export default function DashboardPage() {
       {/* Header */}
       <header className="bg-white border-b shadow-sm sticky top-0 z-10">
         <div className="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between">
-          <div>
-            <div className={`inline-block px-3 py-1 rounded-full text-sm font-semibold border mb-1 ${ROLE_COLORS[session.role]}`}>
-              {ROLE_LABELS[session.role]}
+          <div className="flex items-center gap-3">
+            <img src="/download.png" alt="Рай" className="h-8 object-contain" />
+            <div>
+              <div className={`inline-block px-3 py-1 rounded-full text-sm font-semibold border mb-1 ${ROLE_COLORS[session.role]}`}>
+                {ROLE_LABELS[session.role]}
+              </div>
+              <p className="text-xs text-gray-500">{session.storeName}</p>
             </div>
-            <p className="text-xs text-gray-500">{session.storeName}</p>
           </div>
           <button onClick={logout} className="text-sm text-gray-500 hover:text-gray-700 px-3 py-1 rounded-lg hover:bg-gray-100">
             Изход

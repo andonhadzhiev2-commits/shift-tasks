@@ -51,7 +51,9 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-lg p-8 w-full max-w-sm">
-        <h1 className="text-2xl font-bold text-center text-gray-800 mb-2">Смени & Задачи</h1>
+        <div className="flex justify-center mb-4">
+          <img src="/download.png" alt="Рай Супермаркети" className="h-16 object-contain" />
+        </div>
         <p className="text-center text-gray-500 text-sm mb-6">Въведете вашия PIN код</p>
 
         {/* Store selector */}
