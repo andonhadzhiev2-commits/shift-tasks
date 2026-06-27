@@ -2,11 +2,11 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getIronSession } from 'iron-session'
 import { cookies } from 'next/headers'
 import { prisma } from '@/lib/prisma'
-import { sessionOptions } from '@/lib/session'
+import { sessionOptions, type SessionData } from '@/lib/session'
 import { Shift, RoleType } from '@prisma/client'
 
 export async function GET(req: NextRequest) {
-  const session = await getIronSession(cookies(), sessionOptions)
+  const session = await getIronSession<SessionData>(cookies(), sessionOptions)
   if (!session.storeId) return NextResponse.json({ error: 'Неоторизиран' }, { status: 401 })
 
   const { searchParams } = new URL(req.url)
@@ -14,7 +14,6 @@ export async function GET(req: NextRequest) {
   const role = searchParams.get('role') as RoleType | null
   const storeId = searchParams.get('storeId')
 
-  // Manager can query any store; workers only their own
   const targetStoreId = session.role === 'MANAGER' && storeId
     ? Number(storeId)
     : session.storeId
@@ -38,7 +37,7 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const session = await getIronSession(cookies(), sessionOptions)
+  const session = await getIronSession<SessionData>(cookies(), sessionOptions)
   if (session.role !== 'MANAGER') return NextResponse.json({ error: 'Само управителят може да добавя задачи' }, { status: 403 })
 
   const { storeId, role, shift, title } = await req.json()

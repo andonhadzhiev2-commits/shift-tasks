@@ -2,10 +2,10 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getIronSession } from 'iron-session'
 import { cookies } from 'next/headers'
 import { prisma } from '@/lib/prisma'
-import { sessionOptions } from '@/lib/session'
+import { sessionOptions, type SessionData } from '@/lib/session'
 
 export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
-  const session = await getIronSession(cookies(), sessionOptions)
+  const session = await getIronSession<SessionData>(cookies(), sessionOptions)
   if (session.role !== 'MANAGER') return NextResponse.json({ error: 'Само управителят може да редактира задачи' }, { status: 403 })
 
   const { title, active } = await req.json()
@@ -18,7 +18,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
 }
 
 export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
-  const session = await getIronSession(cookies(), sessionOptions)
+  const session = await getIronSession<SessionData>(cookies(), sessionOptions)
   if (session.role !== 'MANAGER') return NextResponse.json({ error: 'Само управителят може да изтрива задачи' }, { status: 403 })
 
   await prisma.task.update({ where: { id: Number(params.id) }, data: { active: false } })

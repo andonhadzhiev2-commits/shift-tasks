@@ -2,10 +2,10 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getIronSession } from 'iron-session'
 import { cookies } from 'next/headers'
 import { prisma } from '@/lib/prisma'
-import { sessionOptions } from '@/lib/session'
+import { sessionOptions, type SessionData } from '@/lib/session'
 
 export async function GET() {
-  const session = await getIronSession(cookies(), sessionOptions)
+  const session = await getIronSession<SessionData>(cookies(), sessionOptions)
   if (session.role !== 'MANAGER') return NextResponse.json({ error: 'Само управителят' }, { status: 403 })
 
   const pins = await prisma.rolePin.findMany({
@@ -16,7 +16,7 @@ export async function GET() {
 }
 
 export async function PATCH(req: NextRequest) {
-  const session = await getIronSession(cookies(), sessionOptions)
+  const session = await getIronSession<SessionData>(cookies(), sessionOptions)
   if (session.role !== 'MANAGER') return NextResponse.json({ error: 'Само управителят' }, { status: 403 })
 
   const { role, pin } = await req.json()
