@@ -1,0 +1,71 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum RoleType {
+  CASHIER
+  WEIGHER
+  WAREHOUSE
+  MANAGER
+}
+
+enum Shift {
+  FIRST
+  SECOND
+}
+
+model Store {
+  id            Int            @id @default(autoincrement())
+  name          String
+  rolePins      RolePin[]
+  tasks         Task[]
+  notifications Notification[]
+  createdAt     DateTime       @default(now())
+}
+
+model RolePin {
+  id       Int      @id @default(autoincrement())
+  store    Store    @relation(fields: [storeId], references: [id])
+  storeId  Int
+  role     RoleType
+  pin      String
+
+  @@unique([storeId, role])
+}
+
+model Task {
+  id          Int              @id @default(autoincrement())
+  store       Store            @relation(fields: [storeId], references: [id])
+  storeId     Int
+  role        RoleType
+  shift       Shift
+  title       String
+  order       Int              @default(0)
+  active      Boolean          @default(true)
+  completions TaskCompletion[]
+  createdAt   DateTime         @default(now())
+}
+
+model TaskCompletion {
+  id          Int      @id @default(autoincrement())
+  task        Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  taskId      Int
+  date        String   // "YYYY-MM-DD"
+  completedAt DateTime @default(now())
+
+  @@unique([taskId, date])
+}
+
+model Notification {
+  id        Int      @id @default(autoincrement())
+  store     Store    @relation(fields: [storeId], references: [id])
+  storeId   Int
+  message   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}

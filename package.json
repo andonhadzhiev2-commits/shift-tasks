@@ -1,0 +1,30 @@
+{
+  "name": "shift-tasks",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "prisma generate && next build",
+    "start": "next start",
+    "postinstall": "prisma generate"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.14.0",
+    "next": "14.2.4",
+    "react": "^18",
+    "react-dom": "^18",
+    "iron-session": "^8.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "autoprefixer": "^10.0.1",
+    "eslint": "^8",
+    "eslint-config-next": "14.2.4",
+    "postcss": "^8",
+    "prisma": "^5.14.0",
+    "tailwindcss": "^3.3.0",
+    "typescript": "^5"
+  }
+}
