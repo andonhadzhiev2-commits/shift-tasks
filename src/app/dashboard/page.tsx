@@ -9,7 +9,18 @@ interface Task {
   id: number
   title: string
   shift: Shift
+  timeFrom: string | null
+  timeTo: string | null
   completions: { id: number }[]
+}
+
+function isOverdue(task: Task): boolean {
+  if (!task.timeTo || task.completions.length > 0) return false
+  const now = new Date()
+  const [h, m] = task.timeTo.split(':').map(Number)
+  const deadline = new Date()
+  deadline.setHours(h, m, 0, 0)
+  return now > deadline
 }
 
 interface Session {
@@ -124,6 +135,7 @@ export default function DashboardPage() {
           <div className="space-y-2">
             {tasks.map(task => {
               const done = task.completions.length > 0
+              const overdue = isOverdue(task)
               return (
                 <button
                   key={task.id}
@@ -131,11 +143,13 @@ export default function DashboardPage() {
                   className={`w-full flex items-center gap-3 p-4 rounded-xl border-2 text-left transition-all ${
                     done
                       ? 'bg-green-50 border-green-200 text-green-800'
-                      : 'bg-white border-gray-200 text-gray-800 hover:border-blue-300 hover:shadow-sm'
+                      : overdue
+                      ? 'bg-red-50 border-red-400 text-red-900 animate-pulse'
+                      : 'bg-white border-gray-200 text-gray-800 hover:border-red-300 hover:shadow-sm'
                   }`}
                 >
                   <div className={`w-6 h-6 rounded-full border-2 flex-shrink-0 flex items-center justify-center transition-all ${
-                    done ? 'bg-green-500 border-green-500 text-white' : 'border-gray-300'
+                    done ? 'bg-green-500 border-green-500 text-white' : overdue ? 'border-red-400' : 'border-gray-300'
                   }`}>
                     {done && (
                       <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
@@ -143,7 +157,14 @@ export default function DashboardPage() {
                       </svg>
                     )}
                   </div>
-                  <span className={`text-sm font-medium ${done ? 'line-through text-green-700' : ''}`}>{task.title}</span>
+                  <div className="flex-1 min-w-0">
+                    <p className={`text-sm font-medium ${done ? 'line-through text-green-700' : overdue ? 'text-red-800' : ''}`}>{task.title}</p>
+                    {(task.timeFrom || task.timeTo) && !done && (
+                      <p className={`text-xs mt-0.5 ${overdue ? 'text-red-500 font-semibold' : 'text-gray-400'}`}>
+                        {task.timeFrom || '--:--'} – {task.timeTo || '--:--'}{overdue ? ' ⚠ Просрочена' : ''}
+                      </p>
+                    )}
+                  </div>
                 </button>
               )
             })}

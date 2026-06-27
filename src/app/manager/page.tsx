@@ -27,6 +27,8 @@ interface Task {
   role: RoleType
   shift: Shift
   active: boolean
+  timeFrom: string | null
+  timeTo: string | null
   completions: { id: number }[]
 }
 
@@ -52,6 +54,10 @@ function SortableTask({
   editingId,
   editTitle,
   setEditTitle,
+  editTimeFrom,
+  setEditTimeFrom,
+  editTimeTo,
+  setEditTimeTo,
   onEdit,
   onSave,
   onCancel,
@@ -61,6 +67,10 @@ function SortableTask({
   editingId: number | null
   editTitle: string
   setEditTitle: (v: string) => void
+  editTimeFrom: string
+  setEditTimeFrom: (v: string) => void
+  editTimeTo: string
+  setEditTimeTo: (v: string) => void
   onEdit: () => void
   onSave: () => void
   onCancel: () => void
@@ -78,13 +88,12 @@ function SortableTask({
     <div
       ref={setNodeRef}
       style={style}
-      className={`bg-white rounded-xl border-2 p-3 sm:p-4 flex items-center gap-2 sm:gap-3 ${task.completions.length > 0 ? 'border-green-200' : 'border-gray-100'}`}
+      className={`bg-white rounded-xl border-2 p-3 sm:p-4 flex items-start gap-2 sm:gap-3 ${task.completions.length > 0 ? 'border-green-200' : 'border-gray-100'}`}
     >
-      {/* Drag handle */}
       <button
         {...attributes}
         {...listeners}
-        className="touch-none flex-shrink-0 text-gray-300 hover:text-gray-500 cursor-grab active:cursor-grabbing p-1"
+        className="touch-none flex-shrink-0 text-gray-300 hover:text-gray-500 cursor-grab active:cursor-grabbing p-1 mt-0.5"
         aria-label="Преместете"
       >
         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -92,26 +101,41 @@ function SortableTask({
         </svg>
       </button>
 
-      <div className={`w-4 h-4 rounded-full border-2 flex-shrink-0 ${task.completions.length > 0 ? 'bg-green-500 border-green-500' : 'border-gray-300'}`} />
+      <div className={`w-4 h-4 rounded-full border-2 flex-shrink-0 mt-1 ${task.completions.length > 0 ? 'bg-green-500 border-green-500' : 'border-gray-300'}`} />
 
       {editingId === task.id ? (
-        <div className="flex-1 flex gap-2 flex-wrap">
+        <div className="flex-1 flex flex-col gap-2">
           <input
             value={editTitle}
             onChange={e => setEditTitle(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && onSave()}
-            className="flex-1 min-w-0 px-3 py-1.5 border border-purple-300 rounded-lg text-sm focus:outline-none"
+            className="w-full px-3 py-1.5 border border-purple-300 rounded-lg text-sm focus:outline-none"
             autoFocus
           />
-          <button onClick={onSave} className="text-purple-600 text-xs font-semibold hover:text-purple-800">Запази</button>
-          <button onClick={onCancel} className="text-gray-400 text-xs hover:text-gray-600">Отказ</button>
+          <div className="flex gap-2 items-center">
+            <span className="text-xs text-gray-500">От:</span>
+            <input type="time" value={editTimeFrom} onChange={e => setEditTimeFrom(e.target.value)}
+              className="border border-gray-200 rounded-lg px-2 py-1 text-xs focus:outline-none focus:border-purple-300" />
+            <span className="text-xs text-gray-500">До:</span>
+            <input type="time" value={editTimeTo} onChange={e => setEditTimeTo(e.target.value)}
+              className="border border-gray-200 rounded-lg px-2 py-1 text-xs focus:outline-none focus:border-purple-300" />
+          </div>
+          <div className="flex gap-2">
+            <button onClick={onSave} className="text-purple-600 text-xs font-semibold hover:text-purple-800">Запази</button>
+            <button onClick={onCancel} className="text-gray-400 text-xs hover:text-gray-600">Отказ</button>
+          </div>
         </div>
       ) : (
-        <>
-          <span className={`flex-1 text-sm ${task.completions.length > 0 ? 'line-through text-gray-400' : 'text-gray-800'}`}>{task.title}</span>
-          <button onClick={onEdit} className="text-xs text-gray-400 hover:text-purple-600 px-1">Редакция</button>
-          <button onClick={onDelete} className="text-xs text-gray-400 hover:text-red-500 px-1">Изтрий</button>
-        </>
+        <div className="flex-1 min-w-0">
+          <span className={`text-sm ${task.completions.length > 0 ? 'line-through text-gray-400' : 'text-gray-800'}`}>{task.title}</span>
+          {(task.timeFrom || task.timeTo) && (
+            <p className="text-xs text-gray-400 mt-0.5">{task.timeFrom || '--:--'} – {task.timeTo || '--:--'}</p>
+          )}
+          <div className="flex gap-2 mt-1">
+            <button onClick={onEdit} className="text-xs text-gray-400 hover:text-purple-600">Редакция</button>
+            <button onClick={onDelete} className="text-xs text-gray-400 hover:text-red-500">Изтрий</button>
+          </div>
+        </div>
       )}
     </div>
   )
@@ -129,6 +153,10 @@ export default function ManagerPage() {
   const [newTitle, setNewTitle] = useState('')
   const [editingId, setEditingId] = useState<number | null>(null)
   const [editTitle, setEditTitle] = useState('')
+  const [editTimeFrom, setEditTimeFrom] = useState('')
+  const [editTimeTo, setEditTimeTo] = useState('')
+  const [newTimeFrom, setNewTimeFrom] = useState('')
+  const [newTimeTo, setNewTimeTo] = useState('')
   const [pins, setPins] = useState<{ role: RoleType; pin: string }[]>([])
   const [editPin, setEditPin] = useState<{ role: RoleType; pin: string } | null>(null)
 
@@ -193,9 +221,11 @@ export default function ManagerPage() {
     await fetch('/api/tasks', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ storeId: session!.storeId, role: filterRole, shift: filterShift, title: newTitle.trim() }),
+      body: JSON.stringify({ storeId: session!.storeId, role: filterRole, shift: filterShift, title: newTitle.trim(), timeFrom: newTimeFrom || null, timeTo: newTimeTo || null }),
     })
     setNewTitle('')
+    setNewTimeFrom('')
+    setNewTimeTo('')
     loadTasks()
   }
 
@@ -203,7 +233,7 @@ export default function ManagerPage() {
     await fetch(`/api/tasks/${id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ title: editTitle }),
+      body: JSON.stringify({ title: editTitle, timeFrom: editTimeFrom || null, timeTo: editTimeTo || null }),
     })
     setEditingId(null)
     loadTasks()
@@ -295,17 +325,25 @@ export default function ManagerPage() {
               </p>
             </div>
 
-            <div className="flex gap-2 mb-4">
+            <div className="bg-white rounded-xl border border-gray-200 p-3 mb-4 flex flex-col gap-2">
               <input
                 value={newTitle}
                 onChange={e => setNewTitle(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && addTask()}
                 placeholder="Добавете нова задача..."
-                className="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-purple-400 bg-white"
+                className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-purple-400"
               />
-              <button onClick={addTask} className="px-4 py-2.5 bg-purple-600 text-white rounded-xl text-sm font-semibold hover:bg-purple-700">
-                Добави
-              </button>
+              <div className="flex gap-2 items-center flex-wrap">
+                <span className="text-xs text-gray-500">От:</span>
+                <input type="time" value={newTimeFrom} onChange={e => setNewTimeFrom(e.target.value)}
+                  className="border border-gray-200 rounded-lg px-2 py-1 text-xs focus:outline-none focus:border-purple-300" />
+                <span className="text-xs text-gray-500">До:</span>
+                <input type="time" value={newTimeTo} onChange={e => setNewTimeTo(e.target.value)}
+                  className="border border-gray-200 rounded-lg px-2 py-1 text-xs focus:outline-none focus:border-purple-300" />
+                <button onClick={addTask} className="ml-auto px-4 py-1.5 bg-purple-600 text-white rounded-lg text-sm font-semibold hover:bg-purple-700">
+                  Добави
+                </button>
+              </div>
             </div>
 
             <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
@@ -318,7 +356,11 @@ export default function ManagerPage() {
                       editingId={editingId}
                       editTitle={editTitle}
                       setEditTitle={setEditTitle}
-                      onEdit={() => { setEditingId(task.id); setEditTitle(task.title) }}
+                      editTimeFrom={editTimeFrom}
+                      setEditTimeFrom={setEditTimeFrom}
+                      editTimeTo={editTimeTo}
+                      setEditTimeTo={setEditTimeTo}
+                      onEdit={() => { setEditingId(task.id); setEditTitle(task.title); setEditTimeFrom(task.timeFrom || ''); setEditTimeTo(task.timeTo || '') }}
                       onSave={() => updateTask(task.id)}
                       onCancel={() => setEditingId(null)}
                       onDelete={() => deleteTask(task.id)}

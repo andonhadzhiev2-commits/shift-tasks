@@ -1,0 +1,2 @@
+ALTER TABLE "Task" ADD COLUMN "timeFrom" TEXT;
+ALTER TABLE "Task" ADD COLUMN "timeTo" TEXT;

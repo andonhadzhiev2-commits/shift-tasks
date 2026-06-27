@@ -42,11 +42,11 @@ export async function POST(req: NextRequest) {
   const session = await getIronSession<SessionData>(cookies(), sessionOptions)
   if (session.role !== 'MANAGER') return NextResponse.json({ error: 'Само управителят може да добавя задачи' }, { status: 403 })
 
-  const { storeId, role, shift, title } = await req.json()
+  const { storeId, role, shift, title, timeFrom, timeTo } = await req.json()
   const count = await prisma.task.count({ where: { storeId: Number(storeId), role, shift } })
 
   const task = await prisma.task.create({
-    data: { storeId: Number(storeId), role, shift, title, order: count },
+    data: { storeId: Number(storeId), role, shift, title, order: count, timeFrom: timeFrom || null, timeTo: timeTo || null },
   })
 
   return NextResponse.json(task)

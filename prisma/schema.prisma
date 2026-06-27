@@ -47,6 +47,8 @@ model Task {
   title       String
   order       Int              @default(0)
   active      Boolean          @default(true)
+  timeFrom    String?          // "HH:MM"
+  timeTo      String?          // "HH:MM"
   completions TaskCompletion[]
   createdAt   DateTime         @default(now())
 }

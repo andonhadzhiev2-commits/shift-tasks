@@ -10,10 +10,15 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
   const session = await getIronSession<SessionData>(cookies(), sessionOptions)
   if (session.role !== 'MANAGER') return NextResponse.json({ error: 'Само управителят може да редактира задачи' }, { status: 403 })
 
-  const { title, active } = await req.json()
+  const { title, active, timeFrom, timeTo } = await req.json()
   const task = await prisma.task.update({
     where: { id: Number(params.id) },
-    data: { ...(title !== undefined ? { title } : {}), ...(active !== undefined ? { active } : {}) },
+    data: {
+      ...(title !== undefined ? { title } : {}),
+      ...(active !== undefined ? { active } : {}),
+      ...(timeFrom !== undefined ? { timeFrom: timeFrom || null } : {}),
+      ...(timeTo !== undefined ? { timeTo: timeTo || null } : {}),
+    },
   })
 
   return NextResponse.json(task)
