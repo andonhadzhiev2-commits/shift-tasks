@@ -20,23 +20,32 @@ export default function LoginPage() {
   }, [router])
 
   function appendPin(digit: string) {
-    if (pin.length < 6) setPin(p => p + digit)
+    if (pin.length < 4) {
+      const newPin = pin + digit
+      setPin(newPin)
+      if (newPin.length === 4) setTimeout(() => handleLoginWithPin(newPin), 100)
+    }
   }
 
-  async function handleLogin() {
-    if (!storeId) { setError('Изберете магазин'); return }
-    if (pin.length < 4) { setError('PIN кодът е твърде кратък'); return }
+  async function handleLoginWithPin(p: string) {
+    if (!storeId) { setError('Изберете магазин'); setPin(''); return }
     setLoading(true)
     setError('')
     const res = await fetch('/api/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ storeId, pin }),
+      body: JSON.stringify({ storeId, pin: p }),
     })
     const data = await res.json()
     setLoading(false)
-    if (!res.ok) { setError(data.error || 'Грешка'); setPin(''); return }
+    if (!res.ok) { setError(data.error || 'Невалиден PIN'); setPin(''); return }
     router.push(data.role === 'MANAGER' ? '/manager' : '/dashboard')
+  }
+
+  async function handleLogin() {
+    if (!storeId) { setError('Изберете магазин'); return }
+    if (pin.length < 4) { setError('Въведете 4-цифрен PIN'); return }
+    handleLoginWithPin(pin)
   }
 
   return (
@@ -68,7 +77,7 @@ export default function LoginPage() {
         {/* PIN display */}
         <div className="mb-4">
           <div className="flex justify-center gap-2 py-3">
-            {[0, 1, 2, 3, 4, 5].map(i => (
+            {[0, 1, 2, 3].map(i => (
               <div
                 key={i}
                 className={`w-10 h-10 rounded-full border-2 flex items-center justify-center text-xl font-bold transition-all ${
