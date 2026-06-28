@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { ROLE_LABELS, SHIFT_LABELS } from '@/lib/types'
 import type { RoleType, Shift } from '@/lib/types'
@@ -62,7 +62,7 @@ function SortableTask({
   task: Task
   editingId: number | null
   editTask: { title: string; timeFrom: string; timeTo: string }
-  setEditTask: (v: { title: string; timeFrom: string; timeTo: string }) => void
+  setEditTask: React.Dispatch<React.SetStateAction<{ title: string; timeFrom: string; timeTo: string }>>
   onEdit: () => void
   onSave: () => void
   onCancel: () => void
@@ -99,18 +99,18 @@ function SortableTask({
         <div className="flex-1 flex flex-col gap-2">
           <input
             value={editTask.title}
-            onChange={e => setEditTask({ ...editTask, title: e.target.value })}
+            onChange={e => setEditTask(prev => ({ ...prev, title: e.target.value }))}
             className="w-full px-3 py-1.5 border border-purple-300 rounded-lg text-sm focus:outline-none"
             autoFocus
           />
           <div className="flex gap-2 items-center">
             <span className="text-xs text-gray-500">От:</span>
             <input type="time" value={editTask.timeFrom}
-              onChange={e => setEditTask({ ...editTask, timeFrom: e.target.value })}
+              onChange={e => setEditTask(prev => ({ ...prev, timeFrom: e.target.value }))}
               className="border border-gray-200 rounded-lg px-2 py-1 text-xs focus:outline-none focus:border-purple-300" />
             <span className="text-xs text-gray-500">До:</span>
             <input type="time" value={editTask.timeTo}
-              onChange={e => setEditTask({ ...editTask, timeTo: e.target.value })}
+              onChange={e => setEditTask(prev => ({ ...prev, timeTo: e.target.value }))}
               className="border border-gray-200 rounded-lg px-2 py-1 text-xs focus:outline-none focus:border-purple-300" />
           </div>
           <div className="flex gap-2">
