@@ -33,14 +33,17 @@ async function sendPush(sub: { endpoint: string; p256dh: string; auth: string },
 }
 
 export async function GET(req: Request) {
+  const diagnostics: Record<string, string> = {}
+
   try {
     webpush.setVapidDetails(
       'mailto:' + (process.env.VAPID_EMAIL || 'admin@example.com'),
       process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || '',
       process.env.VAPID_PRIVATE_KEY || ''
     )
+    diagnostics.vapid = 'ok'
   } catch (e: unknown) {
-    return NextResponse.json({ error: 'VAPID init failed', detail: String(e) }, { status: 500 })
+    return NextResponse.json({ step: 'vapid', error: String(e) })
   }
 
   const secret = process.env.CRON_SECRET
@@ -50,14 +53,16 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
   }
+  diagnostics.auth = 'ok'
 
   const today = getToday()
   const now = getCurrentTime()
 
   try {
     await prisma.$queryRaw`SELECT 1 FROM "PushSubscription" LIMIT 1`
+    diagnostics.db = 'ok'
   } catch (e: unknown) {
-    return NextResponse.json({ error: 'DB table missing', detail: String(e) }, { status: 500 })
+    return NextResponse.json({ step: 'db_check', error: String(e), diagnostics })
   }
 
   // Find tasks starting now (timeFrom matches current HH:MM)
