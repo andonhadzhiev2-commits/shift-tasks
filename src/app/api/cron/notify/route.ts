@@ -38,8 +38,8 @@ export async function GET(req: Request) {
   try {
     webpush.setVapidDetails(
       'mailto:' + (process.env.VAPID_EMAIL || 'admin@example.com'),
-      process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || '',
-      process.env.VAPID_PRIVATE_KEY || ''
+      (process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || '').trim(),
+      (process.env.VAPID_PRIVATE_KEY || '').trim()
     )
     diagnostics.vapid = 'ok'
   } catch (e: unknown) {
