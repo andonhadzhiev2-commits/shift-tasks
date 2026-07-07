@@ -4,12 +4,6 @@ import webpush from 'web-push'
 
 export const dynamic = 'force-dynamic'
 
-webpush.setVapidDetails(
-  'mailto:' + (process.env.VAPID_EMAIL || 'admin@example.com'),
-  process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || '',
-  process.env.VAPID_PRIVATE_KEY || ''
-)
-
 function getToday() {
   return new Date().toISOString().slice(0, 10)
 }
@@ -39,6 +33,12 @@ async function sendPush(sub: { endpoint: string; p256dh: string; auth: string },
 }
 
 export async function GET(req: Request) {
+  webpush.setVapidDetails(
+    'mailto:' + (process.env.VAPID_EMAIL || 'admin@example.com'),
+    process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || '',
+    process.env.VAPID_PRIVATE_KEY || ''
+  )
+
   const secret = process.env.CRON_SECRET
   if (secret) {
     const auth = req.headers.get('authorization')
