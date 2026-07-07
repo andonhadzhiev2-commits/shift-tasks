@@ -38,6 +38,15 @@ const DEFAULT_TASKS = [
   { role: 'BAR', shift: 'SECOND', title: 'Попълване на наличностите' },
   { role: 'BAR', shift: 'SECOND', title: 'Почистване на оборудването' },
   { role: 'BAR', shift: 'SECOND', title: 'Затваряне и финален отчет на бара' },
+  { role: 'FLOOR_MANAGER', shift: 'FIRST', title: 'Проверка на търговската зала' },
+  { role: 'FLOOR_MANAGER', shift: 'FIRST', title: 'Разпределяне на задачите към персонала' },
+  { role: 'FLOOR_MANAGER', shift: 'FIRST', title: 'Проверка на наличностите по стелажи' },
+  { role: 'FLOOR_MANAGER', shift: 'FIRST', title: 'Контрол на срока на годност' },
+  { role: 'FLOOR_MANAGER', shift: 'FIRST', title: 'Проверка на чистотата в залата' },
+  { role: 'FLOOR_MANAGER', shift: 'SECOND', title: 'Приемане на смяната' },
+  { role: 'FLOOR_MANAGER', shift: 'SECOND', title: 'Проверка на касовите наличности' },
+  { role: 'FLOOR_MANAGER', shift: 'SECOND', title: 'Контрол на персонала в залата' },
+  { role: 'FLOOR_MANAGER', shift: 'SECOND', title: 'Финален преглед и предаване на смяната' },
 ]
 
 const DEFAULT_PINS = [
@@ -45,6 +54,7 @@ const DEFAULT_PINS = [
   { role: 'WEIGHER', pin: '2222' },
   { role: 'WAREHOUSE', pin: '3333' },
   { role: 'BAR', pin: '4444' },
+  { role: 'FLOOR_MANAGER', pin: '5555' },
   { role: 'MANAGER', pin: '9999' },
 ]
 

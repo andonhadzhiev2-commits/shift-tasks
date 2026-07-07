@@ -12,6 +12,7 @@ enum RoleType {
   WEIGHER
   WAREHOUSE
   BAR
+  FLOOR_MANAGER
   MANAGER
 }
 

@@ -1,4 +1,4 @@
-export type RoleType = 'CASHIER' | 'WEIGHER' | 'WAREHOUSE' | 'BAR' | 'MANAGER'
+export type RoleType = 'CASHIER' | 'WEIGHER' | 'WAREHOUSE' | 'BAR' | 'FLOOR_MANAGER' | 'MANAGER'
 export type Shift = 'FIRST' | 'SECOND'
 
 export const ROLE_LABELS: Record<RoleType, string> = {
@@ -6,6 +6,7 @@ export const ROLE_LABELS: Record<RoleType, string> = {
   WEIGHER: 'Везнар',
   WAREHOUSE: 'Складов работник',
   BAR: 'ОТЗ - Бар',
+  FLOOR_MANAGER: 'Салонен управител',
   MANAGER: 'Управител',
 }
 
@@ -19,5 +20,6 @@ export const ROLE_COLORS: Record<RoleType, string> = {
   WEIGHER: 'bg-green-100 text-green-800 border-green-200',
   WAREHOUSE: 'bg-orange-100 text-orange-800 border-orange-200',
   BAR: 'bg-pink-100 text-pink-800 border-pink-200',
+  FLOOR_MANAGER: 'bg-teal-100 text-teal-800 border-teal-200',
   MANAGER: 'bg-purple-100 text-purple-800 border-purple-200',
 }
