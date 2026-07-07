@@ -29,12 +29,22 @@ const DEFAULT_TASKS = [
   { role: 'WAREHOUSE', shift: 'SECOND', title: 'Попълване на стелажите' },
   { role: 'WAREHOUSE', shift: 'SECOND', title: 'Приемане на следобедна доставка' },
   { role: 'WAREHOUSE', shift: 'SECOND', title: 'Отчет за наличностите' },
+  { role: 'BAR', shift: 'FIRST', title: 'Проверка на наличностите в бара' },
+  { role: 'BAR', shift: 'FIRST', title: 'Подготовка на оборудването' },
+  { role: 'BAR', shift: 'FIRST', title: 'Зареждане на хладилниците' },
+  { role: 'BAR', shift: 'FIRST', title: 'Проверка на срока на годност на продуктите' },
+  { role: 'BAR', shift: 'FIRST', title: 'Отчет на дневните продажби в бара' },
+  { role: 'BAR', shift: 'SECOND', title: 'Приемане на бара от предишната смяна' },
+  { role: 'BAR', shift: 'SECOND', title: 'Попълване на наличностите' },
+  { role: 'BAR', shift: 'SECOND', title: 'Почистване на оборудването' },
+  { role: 'BAR', shift: 'SECOND', title: 'Затваряне и финален отчет на бара' },
 ]
 
 const DEFAULT_PINS = [
   { role: 'CASHIER', pin: '1111' },
   { role: 'WEIGHER', pin: '2222' },
   { role: 'WAREHOUSE', pin: '3333' },
+  { role: 'BAR', pin: '4444' },
   { role: 'MANAGER', pin: '9999' },
 ]
 

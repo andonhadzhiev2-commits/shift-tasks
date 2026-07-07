@@ -44,7 +44,7 @@ interface Session {
   storeName: string
 }
 
-const ROLES: RoleType[] = ['CASHIER', 'WEIGHER', 'WAREHOUSE']
+const ROLES: RoleType[] = ['CASHIER', 'WEIGHER', 'WAREHOUSE', 'BAR']
 const SHIFTS: Shift[] = ['FIRST', 'SECOND']
 
 type Tab = 'tasks' | 'notifications' | 'pins'

@@ -3,7 +3,7 @@ import type { SessionOptions } from 'iron-session'
 export interface SessionData {
   storeId?: number
   storeName?: string
-  role?: 'CASHIER' | 'WEIGHER' | 'WAREHOUSE' | 'MANAGER'
+  role?: 'CASHIER' | 'WEIGHER' | 'WAREHOUSE' | 'BAR' | 'MANAGER'
 }
 
 export const sessionOptions: SessionOptions = {

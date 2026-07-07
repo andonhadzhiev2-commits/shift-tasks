@@ -1,0 +1,1 @@
+ALTER TYPE "RoleType" ADD VALUE 'BAR';

@@ -11,6 +11,7 @@ enum RoleType {
   CASHIER
   WEIGHER
   WAREHOUSE
+  BAR
   MANAGER
 }
 
