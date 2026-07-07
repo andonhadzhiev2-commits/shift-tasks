@@ -1,7 +1,7 @@
 const { PrismaClient } = require('@prisma/client')
 const prisma = new PrismaClient()
 
-const STORES = ['Магазин 1', 'Магазин 2', 'Магазин 3', 'Магазин 4', 'Магазин 5']
+const STORES = ['Магазин 1', 'Магазин 2', 'Магазин 3', 'Магазин 4', 'Магазин 5', 'Коктейл-бар']
 
 const DEFAULT_TASKS = [
   { role: 'CASHIER', shift: 'FIRST', title: 'Проверка на касата в началото на смяната' },
@@ -48,24 +48,28 @@ const DEFAULT_PINS = [
   { role: 'MANAGER', pin: '9999' },
 ]
 
+async function seedStore(storeName) {
+  const existing = await prisma.store.findFirst({ where: { name: storeName } })
+  if (existing) { console.log(`⏭  ${storeName} (вече съществува)`); return }
+
+  const store = await prisma.store.create({ data: { name: storeName } })
+
+  for (const { role, pin } of DEFAULT_PINS) {
+    await prisma.rolePin.create({ data: { storeId: store.id, role, pin } })
+  }
+
+  for (let i = 0; i < DEFAULT_TASKS.length; i++) {
+    const { role, shift, title } = DEFAULT_TASKS[i]
+    await prisma.task.create({ data: { storeId: store.id, role, shift, title, order: i } })
+  }
+
+  console.log(`✓ ${storeName}`)
+}
+
 async function main() {
   console.log('Seeding...')
-  const existing = await prisma.store.count()
-  if (existing > 0) { console.log('Already seeded, skipping.'); return }
-
   for (const storeName of STORES) {
-    const store = await prisma.store.create({ data: { name: storeName } })
-
-    for (const { role, pin } of DEFAULT_PINS) {
-      await prisma.rolePin.create({ data: { storeId: store.id, role, pin } })
-    }
-
-    for (let i = 0; i < DEFAULT_TASKS.length; i++) {
-      const { role, shift, title } = DEFAULT_TASKS[i]
-      await prisma.task.create({ data: { storeId: store.id, role, shift, title, order: i } })
-    }
-
-    console.log(`✓ ${storeName}`)
+    await seedStore(storeName)
   }
   console.log('Done!')
 }
