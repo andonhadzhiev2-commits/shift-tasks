@@ -33,11 +33,15 @@ async function sendPush(sub: { endpoint: string; p256dh: string; auth: string },
 }
 
 export async function GET(req: Request) {
-  webpush.setVapidDetails(
-    'mailto:' + (process.env.VAPID_EMAIL || 'admin@example.com'),
-    process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || '',
-    process.env.VAPID_PRIVATE_KEY || ''
-  )
+  try {
+    webpush.setVapidDetails(
+      'mailto:' + (process.env.VAPID_EMAIL || 'admin@example.com'),
+      process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || '',
+      process.env.VAPID_PRIVATE_KEY || ''
+    )
+  } catch (e: unknown) {
+    return NextResponse.json({ error: 'VAPID init failed', detail: String(e) }, { status: 500 })
+  }
 
   const secret = process.env.CRON_SECRET
   if (secret) {
@@ -49,6 +53,12 @@ export async function GET(req: Request) {
 
   const today = getToday()
   const now = getCurrentTime()
+
+  try {
+    await prisma.$queryRaw`SELECT 1 FROM "PushSubscription" LIMIT 1`
+  } catch (e: unknown) {
+    return NextResponse.json({ error: 'DB table missing', detail: String(e) }, { status: 500 })
+  }
 
   // Find tasks starting now (timeFrom matches current HH:MM)
   const startingTasks = await prisma.task.findMany({
