@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { ROLE_LABELS, SHIFT_LABELS, ROLE_COLORS } from '@/lib/types'
 import type { RoleType, Shift } from '@/lib/types'
+import PushSetup from '@/components/PushSetup'
 
 interface Task {
   id: number
@@ -75,6 +76,7 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <PushSetup />
       {/* Header */}
       <header className="bg-white border-b shadow-sm sticky top-0 z-10">
         <div className="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between">
