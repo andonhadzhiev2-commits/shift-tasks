@@ -60,7 +60,38 @@ const DEFAULT_PINS = [
 
 async function seedStore(storeName) {
   const existing = await prisma.store.findFirst({ where: { name: storeName } })
-  if (existing) { console.log(`⏭  ${storeName} (вече съществува)`); return }
+
+  if (existing) {
+    // Add missing PINs for new roles
+    for (const { role, pin } of DEFAULT_PINS) {
+      const hasPin = await prisma.rolePin.findUnique({
+        where: { storeId_role: { storeId: existing.id, role } },
+      })
+      if (!hasPin) {
+        await prisma.rolePin.create({ data: { storeId: existing.id, role, pin } })
+        console.log(`  + PIN за ${role} в ${storeName}`)
+      }
+    }
+
+    // Add missing tasks for new roles
+    const existingRoles = await prisma.task.findMany({
+      where: { storeId: existing.id },
+      select: { role: true, shift: true, title: true },
+    })
+    const existingKeys = new Set(existingRoles.map(t => `${t.role}|${t.shift}|${t.title}`))
+
+    let order = await prisma.task.count({ where: { storeId: existing.id } })
+    for (const { role, shift, title } of DEFAULT_TASKS) {
+      if (!existingKeys.has(`${role}|${shift}|${title}`)) {
+        await prisma.task.create({ data: { storeId: existing.id, role, shift, title, order } })
+        order++
+        console.log(`  + Задача "${title}" за ${role} в ${storeName}`)
+      }
+    }
+
+    console.log(`⏭  ${storeName} (обновен)`)
+    return
+  }
 
   const store = await prisma.store.create({ data: { name: storeName } })
 
